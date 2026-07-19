@@ -1,0 +1,71 @@
+---
+
+# project information
+project_name: pelorus
+project_url: "https://github.com/linuxserver/pelorus"
+project_logo: "https://raw.githubusercontent.com/linuxserver/docker-templates/master/linuxserver.io/img/pelorus-logo.png"
+project_blurb: "[Pelorus]({{ project_url }}) is an AI navigator for Selkies-powered Linux desktops. Pelorus runs a FastAPI server that gives an LLM agent (Ollama, OpenAI-compatible, or Gemini) control over mouse, keyboard, screenshot, and window management via the [Pixelflux computer-use backend](https://github.com/linuxserver/pixelflux#computer-use-interface-wayland), a Linux accessibility tree (AT-SPI), and optional KWin D-Bus integration."
+project_lsio_github_repo_url: "https://github.com/linuxserver/docker-{{ project_name }}"
+project_categories: "Remote Desktop,AI"
+project_blurb_optional_extras_enabled: false
+# supported architectures
+available_architectures:
+  - {arch: "{{ arch_x86_64 }}", tag: "latest"}
+# container parameters
+common_param_env_vars_enabled: true
+param_container_name: "{{ project_name }}"
+param_usage_include_vols: true
+param_volumes:
+  - {vol_path: "/config", vol_host_path: "/path/to/{{ project_name }}/config", desc: "Users home directory in the container, stores local files and settings"}
+param_usage_include_ports: true
+param_ports:
+  - {external_port: "3001", internal_port: "3001", port_desc: "Pelorus split plane GUI HTTPS."}
+custom_params:
+  - {name: "shm-size", name_compose: "shm_size", value: "1gb", desc: "Recommended for all desktop images."}
+# Selkies blurb settings
+selkies_blurb: true
+show_nvidia: true
+# application setup block
+app_setup_block_enabled: true
+app_setup_block: |
+  https://github.com/user-attachments/assets/226bf96f-a6d6-46c2-95f4-677334dddd03
+
+  ## Split Plane View
+
+  Pelorus ships with a **split plane** landing page served over HTTPS on port **3001**. The left pane loads the raw Pelorus chat UI and the right pane loads your Selkies desktop session in an iframe. Both are also available directly via their subfolders:
+
+  * **Pelorus UI** - `https://yourhost:3001/pelorus/`
+  * **Selkies Session** - `https://yourhost:3001/selkies/`
+
+  HTTP on port **3000** serves only the Selkies desktop session (no Pelorus UI).
+
+  ## LLM Provider
+
+  By default the agent is configured to use **opencode big-pickle** for demo purposes. Users are encouraged to link up their own paid providers or a locally hosted endpoint.
+
+  If you would like to support opencode, you can sign up for [opencode Go](https://opencode.ai/go).
+
+  ### Provider Environment Variables
+
+  Set these to setup a provider on first boot:
+
+  | Variable | Default | Description |
+  |---|---|---|
+  | `PELORUS_PROVIDER` | `ollama` | Provider type (`ollama`, `openai`, `gemini`) |
+  | `PELORUS_ENDPOINT` | `http://host:11434` | LLM API endpoint |
+  | `PELORUS_MODEL` | `gemma4:12b` | Model name |
+  | `PELORUS_API_KEY` | *(empty)* | API key for the provider |
+
+  ### Example API Call
+
+  Use `-k` with `curl` to skip certificate verification (the container uses a self-signed cert by default):
+
+  ```bash
+  curl -k -s https://localhost:3001/pelorus/api/run \
+    -H 'Content-Type: application/json' \
+    -d '{"prompt":"open kate please","response_format":"minimal","stream":true}'
+  ```
+
+# changelog
+changelogs:
+  - {date: "19.07.26:", desc: "Initial release."}
