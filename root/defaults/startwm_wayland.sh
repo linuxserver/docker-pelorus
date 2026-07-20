@@ -108,6 +108,7 @@ export DISPLAY=:0
 export QT_ACCESSIBILITY=1
 export QT_LINUX_ACCESSIBILITY_ALWAYS_ON=1
 export GTK_MODULES=gail:atk-bridge
+export MOZ_ENABLE_WAYLAND=0
 sudo mkdir -p /tmp/.X11-unix
 sudo chmod 1777 /tmp/.X11-unix
 
