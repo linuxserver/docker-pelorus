@@ -11,7 +11,8 @@ LABEL maintainer="thelamer"
 ENV TITLE="Pelorus" \
     PIXELFLUX_WAYLAND=true \
     PIXELFLUX_CU=5000 \
-    NO_GAMEPAD=true
+    NO_GAMEPAD=true \
+    ROOT_PATH=/pelorus
 
 RUN \
   echo "**** add icon ****" && \
