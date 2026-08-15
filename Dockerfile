@@ -48,7 +48,7 @@ RUN \
   mkdir -p /tmp/pelorus && \
   if [ -z ${PELORUS_RELEASE+x} ]; then \
     PELORUS_RELEASE=$(curl -sX GET "https://api.github.com/repos/linuxserver/pelorus/releases/latest" \
-    | awk '/tag_name/{print $4;exit}' FS='[""]'); \
+    | jq -r '.tag_name'); \
   fi && \
   curl -o \
     /tmp/pelorus.tar.gz -L \
