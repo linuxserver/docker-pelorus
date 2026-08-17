@@ -85,7 +85,7 @@ cmake                                                                         4.
 command-line-arguments                                                        UNKNOWN                                 go-module                      
 commonwizards                                                                 UNKNOWN                                 java-archive                   
 compiler-rt                                                                   22.1.8-1                                alpm                           
-containerd                                                                    2.3.3-1                                 alpm                           
+containerd                                                                    2.3.4-1                                 alpm                           
 convertlit                                                                    1.8-13                                  alpm                           
 coreutils                                                                     9.11-2                                  alpm                           
 cpio                                                                          2.15-3                                  alpm                           
@@ -146,7 +146,7 @@ form                                                                          UN
 frameworkintegration                                                          6.28.0-1                                alpm                           
 freeglut                                                                      3.8.0-1                                 alpm                           
 freetype2                                                                     2.14.3-1                                alpm                           
-frei0r-plugins                                                                3.2.3-2                                 alpm                           
+frei0r-plugins                                                                3.3.0-1                                 alpm                           
 fribidi                                                                       1.0.16-2                                alpm                           
 frozenlist                                                                    1.8.0                                   python                         
 fuse-common                                                                   3.18.2-1                                alpm                           
@@ -193,7 +193,7 @@ github.com/containerd/cgroups/v3                                              v3
 github.com/containerd/console                                                 v1.0.5                                  go-module     (+4 duplicates)  
 github.com/containerd/containerd/api                                          v1.11.1                                 go-module     (+4 duplicates)  
 github.com/containerd/containerd/v2                                           v2.3.3                                  go-module                      
-github.com/containerd/containerd/v2                                           v2.3.3+dirty                            go-module     (+3 duplicates)  
+github.com/containerd/containerd/v2                                           v2.3.4+dirty                            go-module     (+3 duplicates)  
 github.com/containerd/continuity                                              v0.5.0                                  go-module     (+4 duplicates)  
 github.com/containerd/errdefs                                                 v1.0.0                                  go-module     (+4 duplicates)  
 github.com/containerd/errdefs/pkg                                             v0.3.0                                  go-module     (+4 duplicates)  
@@ -496,7 +496,7 @@ guile                                                                         3.
 gumbo-parser                                                                  0.13.2-1                                alpm                           
 gzip                                                                          1.14-2                                  alpm                           
 h11                                                                           0.16.0                                  python                         
-harfbuzz                                                                      14.3.0-1                                alpm                           
+harfbuzz                                                                      14.3.1-1                                alpm                           
 harfbuzz-icu                                                                  14.3.1-1                                alpm                           
 hicolor-icon-theme                                                            0.18-1                                  alpm                           
 hidapi                                                                        0.15.0-1                                alpm                           
@@ -543,14 +543,14 @@ json-glib                                                                     1.
 jsoncpp                                                                       1.9.6-3                                 alpm                           
 juh                                                                           UNKNOWN                                 java-archive                   
 jurt                                                                          UNKNOWN                                 java-archive                   
-k8s.io/apimachinery                                                           v0.36.0                                 go-module     (+2 duplicates)  
-k8s.io/client-go                                                              v0.36.0                                 go-module                      
-k8s.io/component-base                                                         v0.36.0                                 go-module                      
-k8s.io/cri-api                                                                v0.36.0                                 go-module     (+1 duplicate)   
-k8s.io/cri-client                                                             v0.36.0                                 go-module                      
-k8s.io/cri-streaming                                                          v0.36.0                                 go-module                      
+k8s.io/apimachinery                                                           v0.36.3                                 go-module     (+2 duplicates)  
+k8s.io/client-go                                                              v0.36.3                                 go-module                      
+k8s.io/component-base                                                         v0.36.3                                 go-module                      
+k8s.io/cri-api                                                                v0.36.3                                 go-module     (+1 duplicate)   
+k8s.io/cri-client                                                             v0.36.3                                 go-module                      
+k8s.io/cri-streaming                                                          v0.36.3                                 go-module                      
 k8s.io/klog/v2                                                                v2.140.0                                go-module     (+2 duplicates)  
-k8s.io/streaming                                                              v0.36.0                                 go-module                      
+k8s.io/streaming                                                              v0.36.3                                 go-module                      
 k8s.io/utils                                                                  v0.0.0-20260319190234-28399d86e0b5      go-module     (+1 duplicate)   
 kaccounts-integration                                                         26.04.3-1                               alpm                           
 kactivitymanagerd                                                             6.7.4-1                                 alpm                           
@@ -935,7 +935,7 @@ noto-fonts-cjk                                                                20
 noto-fonts-emoji                                                              1:2.051-1                               alpm                           
 npth                                                                          1.8-1                                   alpm                           
 nspr                                                                          4.40-1                                  alpm                           
-nss                                                                           3.126-1                                 alpm                           
+nss                                                                           3.127-1                                 alpm                           
 numpy                                                                         2.5.2                                   python                         
 ocean-sound-theme                                                             6.7.4-1                                 alpm                           
 ocl-icd                                                                       2.3.5-1                                 alpm                           
@@ -1155,7 +1155,7 @@ startup-notification                                                          0.
 stdlib                                                                        go1.26.1-X:nodwarf5                     go-module                      
 stdlib                                                                        go1.26.5-X:nodwarf5                     go-module     (+8 duplicates)  
 sudo                                                                          1.9.17.p2-6                             alpm                           
-suitesparse                                                                   7.13.0-1                                alpm                           
+suitesparse                                                                   7.14.0-1                                alpm                           
 svt-av1                                                                       4.2.0-1                                 alpm                           
 syndication                                                                   6.28.0-1                                alpm                           
 syntax-highlighting                                                           6.28.1-1                                alpm                           
