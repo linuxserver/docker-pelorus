@@ -11,7 +11,6 @@ LABEL maintainer="thelamer"
 ENV TITLE="Pelorus" \
     PIXELFLUX_WAYLAND=true \
     PIXELFLUX_CU=5000 \
-    NO_GAMEPAD=true \
     ROOT_PATH=/pelorus
 
 RUN \
@@ -73,8 +72,9 @@ RUN \
 
 # add local files
 COPY /root /
+COPY --from=ghcr.io/linuxserver/selkies-layers:amd64-arch-kwin / /
 
 # ports and volumes
-EXPOSE 3000
+EXPOSE 3001
 
 VOLUME /config
