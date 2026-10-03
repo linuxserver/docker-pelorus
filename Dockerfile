@@ -20,6 +20,7 @@ RUN \
     https://raw.githubusercontent.com/linuxserver/docker-templates/master/linuxserver.io/img/pelorus-logo.png && \
   echo "**** install packages ****" && \
   pacman -Sy --noconfirm --needed \
+    aurorae \
     chromium \
     discover \
     dolphin \
@@ -31,12 +32,21 @@ RUN \
     kate \
     kdenlive \
     konsole \
+    kvantum \
     kwin-x11 \
     libreoffice \
+    packagekit \
+    papirus-icon-theme \
+    pipewire \
     plasma-desktop \
     plasma-x11-session \
     python-gobject \
-    rust && \
+    rust \
+    wireplumber \
+    xdg-desktop-portal \
+    xdg-desktop-portal-kde \
+    xdg-user-dirs \
+    xorg-xhost && \
   cargo install \
     wl-clipboard-rs-tools && \
   echo "**** replace wl-clipboard with rust ****" && \
