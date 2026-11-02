@@ -132,4 +132,5 @@ init_diagram: |
   "pelorus:latest" <- Base Images
 # changelog
 changelogs:
+  - {date: "02.11.26:", desc: "Drop sudo requirement, improve CPU only rendering performance when no GPU is present."}
   - {date: "19.07.26:", desc: "Initial release."}
