@@ -815,7 +815,7 @@ lmdb                                                                          0.
 lpsolve                                                                       5.5.2.14-1                            alpm                           
 lua                                                                           5.5.1-1                               alpm                           
 lua54                                                                         5.4.9-1                               alpm                           
-luajit                                                                        2.1.1793383622+ea9eb7e-1              alpm                           
+luajit                                                                        2.1.1794164915+c5a2fa4-1              alpm                           
 lxml                                                                          6.1.3                                 python                         
 lz4                                                                           1:1.11.0-1                            alpm                           
 lzo                                                                           2.10-5                                alpm                           
