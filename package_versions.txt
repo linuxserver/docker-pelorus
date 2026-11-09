@@ -531,7 +531,7 @@ ktexteditor                                                                   6.
 ktextwidgets                                                                  6.31.0-1                              alpm                           
 kunitconversion                                                               6.31.0-1                              alpm                           
 kuserfeedback                                                                 6.31.0-1                              alpm                           
-kvantum                                                                       1.1.8-1                               alpm                           
+kvantum                                                                       1.1.9-1                               alpm                           
 kwallet                                                                       6.31.0-1                              alpm                           
 kwayland                                                                      6.8.2-1                               alpm                           
 kwidgetsaddons                                                                6.31.0-1                              alpm                           
