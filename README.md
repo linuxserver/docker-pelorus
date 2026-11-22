@@ -37,9 +37,9 @@ Find us at:
 [![Jenkins Build](https://img.shields.io/jenkins/build?labelColor=555555&logoColor=ffffff&style=for-the-badge&jobUrl=https%3A%2F%2Fci.linuxserver.io%2Fjob%2FDocker-Pipeline-Builders%2Fjob%2Fdocker-pelorus%2Fjob%2Fmaster%2F&logo=jenkins)](https://ci.linuxserver.io/job/Docker-Pipeline-Builders/job/docker-pelorus/job/master/)
 [![LSIO CI](https://img.shields.io/badge/dynamic/yaml?color=94398d&labelColor=555555&logoColor=ffffff&style=for-the-badge&label=CI&query=CI&url=https%3A%2F%2Fci-tests.linuxserver.io%2Flinuxserver%2Fpelorus%2Flatest%2Fci-status.yml)](https://ci-tests.linuxserver.io/linuxserver/pelorus/latest/index.html)
 
-[Pelorus](https://github.com/linuxserver/pelorus) is an AI navigator for Selkies-powered Linux desktops. Pelorus runs a FastAPI server that gives an LLM agent (Ollama, OpenAI-compatible, or Gemini) control over mouse, keyboard, screenshot, and window management via the [Pixelflux computer-use backend](https://github.com/linuxserver/pixelflux#computer-use-interface-wayland), a Linux accessibility tree (AT-SPI), and optional KWin D-Bus integration.
+Pelorus is the AI agent interface built into [Selkies](https://github.com/selkies-project/selkies). It describes the desktop to an LLM as text, the windows the Selkies window manager places and the controls applications expose over the Linux accessibility tree (AT-SPI), and drives it with mouse, keyboard, window and screenshot actions from a chat. This image runs Pelorus on the Selkies desktop with a split pane web interface.
 
-[![pelorus](https://raw.githubusercontent.com/linuxserver/docker-templates/master/linuxserver.io/img/pelorus-logo.png)](https://github.com/linuxserver/pelorus)
+[![pelorus](https://raw.githubusercontent.com/linuxserver/docker-templates/master/linuxserver.io/img/pelorus-logo.png)](https://github.com/selkies-project/selkies)
 
 ## Supported Architectures
 
@@ -52,40 +52,42 @@ The architectures supported by this image are:
 | Architecture | Available | Tag |
 | :----: | :----: | ---- |
 | x86-64 | ✅ | amd64-\<version tag\> |
-| arm64 | ❌ | |
+| arm64 | ✅ | arm64v8-\<version tag\> |
 
 ## Application Setup
 
 https://github.com/user-attachments/assets/226bf96f-a6d6-46c2-95f4-677334dddd03
 
-## Split Plane View
+## Split Pane View
 
-Pelorus ships with a **split plane** landing page served over HTTPS on port **3001**. The left pane loads the raw Pelorus chat UI and the right pane loads your Selkies desktop session in an iframe. Both are also available directly via their subfolders:
+Pelorus ships with a **split pane** landing page served over HTTPS on port **3001**. The left pane loads the Pelorus chat UI and the right pane loads your Selkies desktop session in an iframe. Both are also available directly via their subfolders:
 
-* **Pelorus UI** - `https://yourhost:3001/pelorus/`
+* **Pelorus UI** - `https://yourhost:3001/selkies/pelorus/`
 * **Selkies Session** - `https://yourhost:3001/selkies/`
 
-HTTP on port **3000** serves only the Selkies desktop session (no Pelorus UI).
+Port **3000** serves the same over plain HTTP and must be behind a reverse proxy providing HTTPS.
 
 ### Provider Environment Variables
 
-Set these to setup a provider on first boot:
+Set these to configure the model Pelorus uses, otherwise it can be configured from the Pelorus UI:
 
 | Variable | Default | Description |
 |---|---|---|
-| `PELORUS_PROVIDER` | `ollama` | Provider type (`ollama`, `openai`, `gemini`) |
-| `PELORUS_ENDPOINT` | `http://host:11434` | LLM API endpoint |
-| `PELORUS_MODEL` | `gemma4:12b` | Model name |
-| `PELORUS_API_KEY` | *(empty)* | API key for the provider |
+| `SELKIES_PELORUS_PROVIDER` | `anthropic` | Provider type (`anthropic`, `openai`, `gemini`, `openrouter`, `groq`, `mistral`, `deepseek`, `xai`, `together`, `fireworks`, `cerebras`, `ollama`, `lmstudio`, `llamacpp`, `custom`) |
+| `SELKIES_PELORUS_ENDPOINT` | *(provider default)* | Base URL of the model API, for example `http://host:11434/v1` for Ollama |
+| `SELKIES_PELORUS_MODEL` | *(provider default)* | Model name, required for every provider except `anthropic` |
+| `SELKIES_PELORUS_API_KEY` | *(empty)* | API key for the provider |
+
+Setting `SELKIES_PELORUS=true|locked` fixes the model to these settings so nothing is configured from the browser. The legacy `PELORUS_PROVIDER`, `PELORUS_ENDPOINT`, `PELORUS_MODEL` and `PELORUS_API_KEY` variables are still translated to these.
 
 ### Example API Call
 
-Use `-k` with `curl` to skip certificate verification (the container uses a self-signed cert by default):
+Use `-k` with `curl` to skip certificate verification (the container uses a self-signed cert by default), add `-u abc:password` if `PASSWORD` is set:
 
 ```bash
-curl -k -s https://localhost:3001/pelorus/api/run \
+curl -k -s https://localhost:3001/selkies/pelorus/api/run \
   -H 'Content-Type: application/json' \
-  -d '{"prompt":"open kate please","response_format":"minimal","stream":true}'
+  -d '{"prompt":"open the text editor please","stream":true}'
 ```
 
 ### Strict reverse proxies
@@ -187,6 +189,7 @@ services:
     volumes:
       - /path/to/pelorus/config:/config
     ports:
+      - 3000:3000
       - 3001:3001
     shm_size: "1gb"
     restart: unless-stopped
@@ -200,6 +203,7 @@ docker run -d \
   -e PUID=1000 \
   -e PGID=1000 \
   -e TZ=Etc/UTC \
+  -p 3000:3000 \
   -p 3001:3001 \
   -v /path/to/pelorus/config:/config \
   --shm-size="1gb" \
@@ -213,7 +217,8 @@ Containers are configured using parameters passed at runtime (such as those abov
 
 | Parameter | Function |
 | :----: | --- |
-| `-p 3001:3001` | Pelorus split plane GUI HTTPS. |
+| `-p 3000:3000` | Pelorus split pane GUI HTTP, must be proxied. |
+| `-p 3001:3001` | Pelorus split pane GUI HTTPS. |
 | `-e PUID=1000` | for UserID - see below for explanation |
 | `-e PGID=1000` | for GroupID - see below for explanation |
 | `-e TZ=Etc/UTC` | specify a timezone to use, see this [list](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones#List). |
@@ -382,5 +387,6 @@ Once registered you can define the dockerfile to use with `-f Dockerfile.aarch64
 
 ## Versions
 
+* **21.11.26:** - Rebase to Ubuntu dev on the Selkies desktop with Pelorus built into Selkies, served behind nginx, the webtop application set, and arm64 support.
 * **02.11.26:** - Drop sudo requirement, improve CPU only rendering performance when no GPU is present.
 * **19.07.26:** - Initial release.

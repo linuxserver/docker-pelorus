@@ -1,0 +1,23 @@
+#! /bin/bash
+
+BIN=/usr/bin/google-chrome
+
+# Cleanup
+if ! pgrep -x chrome > /dev/null;then
+  rm -f $HOME/.config/google-chrome/Singleton*
+fi
+
+# Wayland check
+if [ "${PIXELFLUX_WAYLAND,,}" == "true" ]; then
+  WAYLAND="--ozone-platform=wayland"
+fi
+
+${BIN} \
+  --password-store=basic \
+  --no-sandbox \
+  --simulate-outdated-no-au='Tue, 31 Dec 2099 23:59:59 GMT' \
+  --test-type \
+  --force-renderer-accessibility \
+  --no-first-run \
+  ${WAYLAND} \
+  "$@"

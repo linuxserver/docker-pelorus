@@ -2,15 +2,16 @@
 
 # project information
 project_name: pelorus
-project_url: "https://github.com/linuxserver/pelorus"
+project_url: "https://github.com/selkies-project/selkies"
 project_logo: "https://raw.githubusercontent.com/linuxserver/docker-templates/master/linuxserver.io/img/pelorus-logo.png"
-project_blurb: "[Pelorus]({{ project_url }}) is an AI navigator for Selkies-powered Linux desktops. Pelorus runs a FastAPI server that gives an LLM agent (Ollama, OpenAI-compatible, or Gemini) control over mouse, keyboard, screenshot, and window management via the [Pixelflux computer-use backend](https://github.com/linuxserver/pixelflux#computer-use-interface-wayland), a Linux accessibility tree (AT-SPI), and optional KWin D-Bus integration."
+project_blurb: "Pelorus is the AI agent interface built into [Selkies]({{ project_url }}). It describes the desktop to an LLM as text, the windows the Selkies window manager places and the controls applications expose over the Linux accessibility tree (AT-SPI), and drives it with mouse, keyboard, window and screenshot actions from a chat. This image runs Pelorus on the Selkies desktop with a split pane web interface."
 project_lsio_github_repo_url: "https://github.com/linuxserver/docker-{{ project_name }}"
 project_categories: "Remote Desktop,AI"
 project_blurb_optional_extras_enabled: false
 # supported architectures
 available_architectures:
-  - {arch: "{{ arch_x86_64 }}", tag: "latest"}
+  - {arch: "{{ arch_x86_64 }}", tag: "amd64-latest"}
+  - {arch: "{{ arch_arm64 }}", tag: "arm64v8-latest"}
 # container parameters
 common_param_env_vars_enabled: true
 param_container_name: "{{ project_name }}"
@@ -19,7 +20,8 @@ param_volumes:
   - {vol_path: "/config", vol_host_path: "/path/to/{{ project_name }}/config", desc: "Users home directory in the container, stores local files and settings"}
 param_usage_include_ports: true
 param_ports:
-  - {external_port: "3001", internal_port: "3001", port_desc: "Pelorus split plane GUI HTTPS."}
+  - {external_port: "3000", internal_port: "3000", port_desc: "Pelorus split pane GUI HTTP, must be proxied."}
+  - {external_port: "3001", internal_port: "3001", port_desc: "Pelorus split pane GUI HTTPS."}
 custom_params:
   - {name: "shm-size", name_compose: "shm_size", value: "1gb", desc: "Recommended for all desktop images."}
 # Selkies blurb settings
@@ -30,34 +32,36 @@ app_setup_block_enabled: true
 app_setup_block: |
   https://github.com/user-attachments/assets/226bf96f-a6d6-46c2-95f4-677334dddd03
 
-  ## Split Plane View
+  ## Split Pane View
 
-  Pelorus ships with a **split plane** landing page served over HTTPS on port **3001**. The left pane loads the raw Pelorus chat UI and the right pane loads your Selkies desktop session in an iframe. Both are also available directly via their subfolders:
+  Pelorus ships with a **split pane** landing page served over HTTPS on port **3001**. The left pane loads the Pelorus chat UI and the right pane loads your Selkies desktop session in an iframe. Both are also available directly via their subfolders:
 
-  * **Pelorus UI** - `https://yourhost:3001/pelorus/`
+  * **Pelorus UI** - `https://yourhost:3001/selkies/pelorus/`
   * **Selkies Session** - `https://yourhost:3001/selkies/`
 
-  HTTP on port **3000** serves only the Selkies desktop session (no Pelorus UI).
+  Port **3000** serves the same over plain HTTP and must be behind a reverse proxy providing HTTPS.
 
   ### Provider Environment Variables
 
-  Set these to setup a provider on first boot:
+  Set these to configure the model Pelorus uses, otherwise it can be configured from the Pelorus UI:
 
   | Variable | Default | Description |
   |---|---|---|
-  | `PELORUS_PROVIDER` | `ollama` | Provider type (`ollama`, `openai`, `gemini`) |
-  | `PELORUS_ENDPOINT` | `http://host:11434` | LLM API endpoint |
-  | `PELORUS_MODEL` | `gemma4:12b` | Model name |
-  | `PELORUS_API_KEY` | *(empty)* | API key for the provider |
+  | `SELKIES_PELORUS_PROVIDER` | `anthropic` | Provider type (`anthropic`, `openai`, `gemini`, `openrouter`, `groq`, `mistral`, `deepseek`, `xai`, `together`, `fireworks`, `cerebras`, `ollama`, `lmstudio`, `llamacpp`, `custom`) |
+  | `SELKIES_PELORUS_ENDPOINT` | *(provider default)* | Base URL of the model API, for example `http://host:11434/v1` for Ollama |
+  | `SELKIES_PELORUS_MODEL` | *(provider default)* | Model name, required for every provider except `anthropic` |
+  | `SELKIES_PELORUS_API_KEY` | *(empty)* | API key for the provider |
+
+  Setting `SELKIES_PELORUS=true|locked` fixes the model to these settings so nothing is configured from the browser. The legacy `PELORUS_PROVIDER`, `PELORUS_ENDPOINT`, `PELORUS_MODEL` and `PELORUS_API_KEY` variables are still translated to these.
 
   ### Example API Call
 
-  Use `-k` with `curl` to skip certificate verification (the container uses a self-signed cert by default):
+  Use `-k` with `curl` to skip certificate verification (the container uses a self-signed cert by default), add `-u abc:password` if `PASSWORD` is set:
 
   ```bash
-  curl -k -s https://localhost:3001/pelorus/api/run \
+  curl -k -s https://localhost:3001/selkies/pelorus/api/run \
     -H 'Content-Type: application/json' \
-    -d '{"prompt":"open kate please","response_format":"minimal","stream":true}'
+    -d '{"prompt":"open the text editor please","stream":true}'
   ```
 # init diagram
 init_diagram: |
@@ -132,5 +136,6 @@ init_diagram: |
   "pelorus:latest" <- Base Images
 # changelog
 changelogs:
+  - {date: "21.11.26:", desc: "Rebase to Ubuntu dev on the Selkies desktop with Pelorus built into Selkies, served behind nginx, the webtop application set, and arm64 support."}
   - {date: "02.11.26:", desc: "Drop sudo requirement, improve CPU only rendering performance when no GPU is present."}
   - {date: "19.07.26:", desc: "Initial release."}

@@ -19,17 +19,15 @@ pipeline {
     DOCKERHUB_TOKEN=credentials('docker-hub-ci-pat')
     QUAYIO_API_TOKEN=credentials('quayio-repo-api-token')
     GIT_SIGNING_KEY=credentials('484fbca6-9a4f-455e-b9e3-97ac98785f5f')
-    EXT_USER = 'linuxserver'
-    EXT_REPO = 'pelorus'
-    BUILD_VERSION_ARG = 'PELORUS_RELEASE'
+    BUILD_VERSION_ARG = 'OS_VERSION'
     LS_USER = 'linuxserver'
     LS_REPO = 'docker-pelorus'
     CONTAINER_NAME = 'pelorus'
     DOCKERHUB_IMAGE = 'linuxserver/pelorus'
     DEV_DOCKERHUB_IMAGE = 'lsiodev/pelorus'
     PR_DOCKERHUB_IMAGE = 'lspipepr/pelorus'
-    DIST_IMAGE = 'arch'
-    MULTIARCH = 'false'
+    DIST_IMAGE = 'ubuntu'
+    MULTIARCH = 'true'
     CI = 'true'
     CI_WEB = 'true'
     CI_PORT = '3001'
@@ -204,23 +202,14 @@ pipeline {
     /* ########################
        External Release Tagging
        ######################## */
-    // If this is a stable github release use the latest endpoint from github to determine the ext tag
-    stage("Set ENV github_stable"){
-     steps{
-       script{
-         env.EXT_RELEASE = sh(
-           script: '''curl -H "Authorization: token ${GITHUB_TOKEN}" -s https://api.github.com/repos/${EXT_USER}/${EXT_REPO}/releases/latest | jq -r '. | .tag_name' ''',
-           returnStdout: true).trim()
-       }
-     }
-    }
-    // If this is a stable or devel github release generate the link for the build message
-    stage("Set ENV github_link"){
-     steps{
-       script{
-         env.RELEASE_LINK = 'https://github.com/' + env.EXT_USER + '/' + env.EXT_REPO + '/releases/tag/' + env.EXT_RELEASE
-       }
-     }
+    // If this is an os release set release type to none to indicate no external release
+    stage("Set ENV os"){
+      steps{
+        script{
+          env.EXT_RELEASE = env.PACKAGE_TAG
+          env.RELEASE_LINK = 'none'
+        }
+      }
     }
     // Sanitize the release tag and strip illegal docker or github characters
     stage("Sanitize tag"){
@@ -667,7 +656,7 @@ pipeline {
                 --label "org.opencontainers.image.licenses=GPL-3.0-only" \
                 --label "org.opencontainers.image.ref.name=${COMMIT_SHA}" \
                 --label "org.opencontainers.image.title=Pelorus" \
-                --label "org.opencontainers.image.description=[Pelorus](https://github.com/linuxserver/pelorus) is an AI navigator for Selkies-powered Linux desktops. Pelorus runs a FastAPI server that gives an LLM agent (Ollama, OpenAI-compatible, or Gemini) control over mouse, keyboard, screenshot, and window management via the [Pixelflux computer-use backend](https://github.com/linuxserver/pixelflux#computer-use-interface-wayland), a Linux accessibility tree (AT-SPI), and optional KWin D-Bus integration." \
+                --label "org.opencontainers.image.description=Pelorus is the AI agent interface built into [Selkies](https://github.com/selkies-project/selkies). It describes the desktop to an LLM as text, the windows the Selkies window manager places and the controls applications expose over the Linux accessibility tree (AT-SPI), and drives it with mouse, keyboard, window and screenshot actions from a chat. This image runs Pelorus on the Selkies desktop with a split pane web interface." \
                 --no-cache --pull -t ${IMAGE}:${META_TAG} --platform=linux/amd64 \
                 --provenance=true --sbom=false --builder=container --load \
                 --build-arg ${BUILD_VERSION_ARG}=${EXT_RELEASE} --build-arg VERSION="${VERSION_TAG}" --build-arg BUILD_DATE=${GITHUB_DATE} .
@@ -755,7 +744,7 @@ pipeline {
                     --label "org.opencontainers.image.licenses=GPL-3.0-only" \
                     --label "org.opencontainers.image.ref.name=${COMMIT_SHA}" \
                     --label "org.opencontainers.image.title=Pelorus" \
-                    --label "org.opencontainers.image.description=[Pelorus](https://github.com/linuxserver/pelorus) is an AI navigator for Selkies-powered Linux desktops. Pelorus runs a FastAPI server that gives an LLM agent (Ollama, OpenAI-compatible, or Gemini) control over mouse, keyboard, screenshot, and window management via the [Pixelflux computer-use backend](https://github.com/linuxserver/pixelflux#computer-use-interface-wayland), a Linux accessibility tree (AT-SPI), and optional KWin D-Bus integration." \
+                    --label "org.opencontainers.image.description=Pelorus is the AI agent interface built into [Selkies](https://github.com/selkies-project/selkies). It describes the desktop to an LLM as text, the windows the Selkies window manager places and the controls applications expose over the Linux accessibility tree (AT-SPI), and drives it with mouse, keyboard, window and screenshot actions from a chat. This image runs Pelorus on the Selkies desktop with a split pane web interface." \
                     --no-cache --pull -t ${IMAGE}:amd64-${META_TAG} --platform=linux/amd64 \
                     --provenance=true --sbom=false --builder=container --load \
                     --build-arg ${BUILD_VERSION_ARG}=${EXT_RELEASE} --build-arg VERSION="${VERSION_TAG}" --build-arg BUILD_DATE=${GITHUB_DATE} .
@@ -875,7 +864,7 @@ pipeline {
                     --label "org.opencontainers.image.licenses=GPL-3.0-only" \
                     --label "org.opencontainers.image.ref.name=${COMMIT_SHA}" \
                     --label "org.opencontainers.image.title=Pelorus" \
-                    --label "org.opencontainers.image.description=[Pelorus](https://github.com/linuxserver/pelorus) is an AI navigator for Selkies-powered Linux desktops. Pelorus runs a FastAPI server that gives an LLM agent (Ollama, OpenAI-compatible, or Gemini) control over mouse, keyboard, screenshot, and window management via the [Pixelflux computer-use backend](https://github.com/linuxserver/pixelflux#computer-use-interface-wayland), a Linux accessibility tree (AT-SPI), and optional KWin D-Bus integration." \
+                    --label "org.opencontainers.image.description=Pelorus is the AI agent interface built into [Selkies](https://github.com/selkies-project/selkies). It describes the desktop to an LLM as text, the windows the Selkies window manager places and the controls applications expose over the Linux accessibility tree (AT-SPI), and drives it with mouse, keyboard, window and screenshot actions from a chat. This image runs Pelorus on the Selkies desktop with a split pane web interface." \
                     --no-cache --pull -f Dockerfile.aarch64 -t ${IMAGE}:arm64v8-${META_TAG} --platform=linux/arm64 \
                     --provenance=true --sbom=false --builder=container --load \
                     --build-arg ${BUILD_VERSION_ARG}=${EXT_RELEASE} --build-arg VERSION="${VERSION_TAG}" --build-arg BUILD_DATE=${GITHUB_DATE} .
@@ -1241,7 +1230,7 @@ pipeline {
                   "type": "commit",\
                   "tagger": {"name": "LinuxServer-CI","email": "ci@linuxserver.io","date": "'${GITHUB_DATE}'"}}'
               echo "Pushing New release for Tag"
-              curl -H "Authorization: token ${GITHUB_TOKEN}" -s https://api.github.com/repos/${EXT_USER}/${EXT_REPO}/releases/latest | jq -r '. |.body' > releasebody.json
+              echo "Updating base packages to ${PACKAGE_TAG}" > releasebody.json
               jq -n \
                 --arg tag_name "$META_TAG" \
                 --arg target_commitish "master" \

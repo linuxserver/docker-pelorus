@@ -2,24 +2,22 @@
 
 # jenkins variables
 project_name: docker-pelorus
-external_type: github_stable
+external_type: os
 release_type: stable
 release_tag: latest
 ls_branch: master
 build_armhf: false
 image_sbom: false
 repo_vars:
-  - EXT_USER = 'linuxserver'
-  - EXT_REPO = 'pelorus'
-  - BUILD_VERSION_ARG = 'PELORUS_RELEASE'
+  - BUILD_VERSION_ARG = 'OS_VERSION'
   - LS_USER = 'linuxserver'
   - LS_REPO = 'docker-pelorus'
   - CONTAINER_NAME = 'pelorus'
   - DOCKERHUB_IMAGE = 'linuxserver/pelorus'
   - DEV_DOCKERHUB_IMAGE = 'lsiodev/pelorus'
   - PR_DOCKERHUB_IMAGE = 'lspipepr/pelorus'
-  - DIST_IMAGE = 'arch'
-  - MULTIARCH = 'false'
+  - DIST_IMAGE = 'ubuntu'
+  - MULTIARCH = 'true'
   - CI = 'true'
   - CI_WEB = 'true'
   - CI_PORT = '3001'
