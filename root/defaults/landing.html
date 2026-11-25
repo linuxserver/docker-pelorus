@@ -15,29 +15,71 @@
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     }
     .container {
+      --split: 50%;
       display: flex;
       height: 100vh;
       width: 100vw;
     }
     .pane {
-      flex: 1;
+      flex: 1 1 0;
+      min-width: 0;
+      min-height: 0;
       border: none;
       background: #1e1e1e;
     }
     .pane-left {
-      border-right: 2px solid #333;
+      flex: 0 0 var(--split);
+    }
+    .handle {
+      flex: 0 0 8px;
+      position: relative;
+      background: #333;
+      cursor: col-resize;
+      touch-action: none;
+    }
+    .handle::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 2px;
+      height: 32px;
+      transform: translate(-50%, -50%);
+      border-radius: 2px;
+      background: #777;
+    }
+    .handle:hover {
+      background: #3d3d3d;
+    }
+    .handle:focus-visible {
+      background: #3d3d3d;
+      outline: 1px solid #aaa;
+      outline-offset: -1px;
+    }
+    .handle:hover::before,
+    .handle:focus-visible::before {
+      background: #aaa;
+    }
+    body.dragging {
+      cursor: col-resize;
+      user-select: none;
+    }
+    body.dragging .pane {
+      pointer-events: none;
     }
     @media (max-width: 768px) {
       .container {
         flex-direction: column;
       }
-      .pane {
-        flex: none;
-        height: 50vh;
+      .handle {
+        cursor: row-resize;
       }
-      .pane-left {
-        border-right: none;
-        border-bottom: 2px solid #333;
+      .handle::before {
+        width: 32px;
+        height: 2px;
+      }
+      body.dragging {
+        cursor: row-resize;
       }
     }
   </style>
@@ -45,7 +87,120 @@
 <body>
   <div class="container">
     <iframe class="pane pane-left" src="./selkies/pelorus/" allow="clipboard-read; clipboard-write"></iframe>
+    <div class="handle" role="separator" tabindex="0" aria-label="Resize panes"
+         aria-valuemin="10" aria-valuemax="90" aria-valuenow="50"></div>
     <iframe class="pane pane-right" src="./selkies/" allow="clipboard-read; clipboard-write"></iframe>
   </div>
+  <script>
+    (function () {
+      var STORE = 'pelorus-split';
+      var MIN = 10;
+      var MAX = 90;
+      var STEP = 2;
+      var DEFAULT = 50;
+      var container = document.querySelector('.container');
+      var handle = document.querySelector('.handle');
+      var stacked = window.matchMedia('(max-width: 768px)');
+      var split = DEFAULT;
+      var active = null;
+      var grab = 0;
+
+      function apply(value, persist) {
+        split = Math.min(MAX, Math.max(MIN, value));
+        container.style.setProperty('--split', split + '%');
+        handle.setAttribute('aria-valuenow', Math.round(split));
+        handle.setAttribute('aria-orientation', stacked.matches ? 'horizontal' : 'vertical');
+        if (persist) {
+          try {
+            localStorage.setItem(STORE, split.toFixed(2));
+          } catch (e) {
+            // storage unavailable, keep the size for this session only
+          }
+        }
+      }
+
+      function stored() {
+        try {
+          return parseFloat(localStorage.getItem(STORE));
+        } catch (e) {
+          return NaN;
+        }
+      }
+
+      function fromPointer(event) {
+        var box = container.getBoundingClientRect();
+        if (stacked.matches) {
+          return ((event.clientY - grab - box.top) / box.height) * 100;
+        }
+        return ((event.clientX - grab - box.left) / box.width) * 100;
+      }
+
+      function stop(event) {
+        if (active === null || event.pointerId !== active) {
+          return;
+        }
+        active = null;
+        document.body.classList.remove('dragging');
+        apply(split, true);
+      }
+
+      handle.addEventListener('pointerdown', function (event) {
+        if (event.pointerType === 'mouse' && event.button !== 0) {
+          return;
+        }
+        var box = handle.getBoundingClientRect();
+        grab = stacked.matches ? event.clientY - box.top : event.clientX - box.left;
+        active = event.pointerId;
+        document.body.classList.add('dragging');
+        // preventDefault keeps the panes from selecting text, so focus by hand
+        event.preventDefault();
+        handle.focus();
+        handle.setPointerCapture(event.pointerId);
+      });
+
+      // on window so the drag survives the pointer leaving the handle
+      window.addEventListener('pointermove', function (event) {
+        if (event.pointerId !== active) {
+          return;
+        }
+        apply(fromPointer(event), false);
+      });
+
+      window.addEventListener('pointerup', stop);
+      window.addEventListener('pointercancel', stop);
+
+      handle.addEventListener('dblclick', function () {
+        apply(DEFAULT, true);
+      });
+
+      handle.addEventListener('keydown', function (event) {
+        var keys = {
+          ArrowLeft: -STEP,
+          ArrowUp: -STEP,
+          ArrowRight: STEP,
+          ArrowDown: STEP
+        };
+        if (event.key in keys) {
+          apply(split + keys[event.key], true);
+        } else if (event.key === 'Home') {
+          apply(MIN, true);
+        } else if (event.key === 'End') {
+          apply(MAX, true);
+        } else if (event.key === 'Enter' || event.key === ' ') {
+          apply(DEFAULT, true);
+        } else {
+          return;
+        }
+        event.preventDefault();
+      });
+
+      stacked.addEventListener('change', function () {
+        apply(split, false);
+      });
+
+      var saved = stored();
+      apply(isNaN(saved) ? DEFAULT : saved, false);
+    })();
+  </script>
 </body>
 </html>

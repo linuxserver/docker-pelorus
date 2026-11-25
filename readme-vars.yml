@@ -41,6 +41,8 @@ app_setup_block: |
 
   Port **3000** serves the same over plain HTTP and must be behind a reverse proxy providing HTTPS.
 
+  The divider between the two panes is a drag handle. Drag it to give either side more room, double click it to go back to an even split, or focus it with the keyboard and resize with the arrow keys, `Home` and `End`. The position is saved in the browser and restored on the next visit.
+
   ### Provider Environment Variables
 
   Set these to configure the model Pelorus uses, otherwise it can be configured from the Pelorus UI:
@@ -117,6 +119,7 @@ init_diagram: |
   "pelorus:latest" <- Base Images
 # changelog
 changelogs:
+  - {date: "25.11.26:", desc: "Add a drag handle to the split pane view to resize the panes."}
   - {date: "21.11.26:", desc: "Rebase to Ubuntu dev on the Selkies desktop with Pelorus built into Selkies, served behind nginx, the webtop application set, and arm64 support."}
   - {date: "02.11.26:", desc: "Drop sudo requirement, improve CPU only rendering performance when no GPU is present."}
   - {date: "19.07.26:", desc: "Initial release."}
